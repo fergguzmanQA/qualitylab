@@ -59,6 +59,30 @@ Este bloque se enfoca en la recolección, almacenamiento y visualización de mé
   * **De Infraestructura (Host/Pods):** Uso de CPU (por núcleo), consumo de memoria RAM (y alertas de falta de memoria / *OOMKilled*), entrada/salida de red (I/O) y espacio en disco.
   * **De Servicios (APIs/Aplicación):** Tasa de peticiones por segundo (*Throughput*), porcentaje de errores (4xx, 5xx) y tiempos de latencia interna del servidor.
 
+
+---
+
+## 📊 Estrategia de Observabilidad & Monitoreo (Shift-Right Testing)
+
+La estrategia de calidad no termina cuando el código se despliega. Implementamos prácticas de **Observabilidad** para transformar datos duros de infraestructura en insights de negocio y estabilidad de software.
+
+### 1. Los Tres Pilares de la Observabilidad en QA
+* **Métricas (Metrics):** Monitoreo en tiempo real de la salud del clúster a través de Prometheus (CPU Throttling, Memory Usage, saturación de red, y tasas de error HTTP 4xx/5xx).
+* **Logs:** Centralización de registros de los microservicios para realizar análisis forense ante fallas puntuales (Stack traces, excepciones no controladas).
+* **Trazas (Traces):** Mapeo del viaje de una petición a través de los diferentes componentes de la arquitectura para aislar qué microservicio o consulta de base de datos introduce latencia.
+
+### 2. Monitoreo Activo vs. Pasivo
+* **Monitoreo Sintético (Active):** Scripts automatizados (Playwright/APIs) ejecutándose de forma cíclica en producción para detectar caídas críticas antes que los usuarios reales.
+* **Monitoreo de Usuario Real (RUM / Passive):** Análisis de la experiencia real del usuario final en Azure (Tiempos de carga reales, tasas de rebote por performance).
+
+### 3. Quality Gates de Infraestructura
+Establecemos umbrales donde una degradación de hardware detiene un despliegue, incluso si las pruebas funcionales dan verde:
+* Alerta de **OOMKilled** (Out Of Memory) inminente en los Pods de Kubernetes.
+* Incremento mayor al 5% en la latencia del percentil 95 ($p(95)$) en las llamadas de API persistentes.
+
 ### 2. Grafana
 * **¿Qué es?** Es la plataforma líder de análisis, visualización y paneles (*dashboards*) interactivos. No almacena datos por sí misma; se conecta a fuentes de datos como Prometheus para consultar esas métricas puras y transformarlas en gráficos de líneas, barras y mapas de calor altamente visuales.
 * **Rol en el Monitoreo de Performance:** Es la cabina de control del ingeniero. Permite correlacionar de forma visual el tráfico que está inyectando k6 (e.g., 2000 usuarios virtuales) con el impacto real en el clúster de Kubernetes y la base de datos en ese preciso segundo, facilitando la detección de cuellos de botella (como picos de CPU o caídas de memoria).
+
+Gracias por leer
+Atte Fernando G. Guzmán
