@@ -1,0 +1,9 @@
+Explicación Teórica Performance
+
+Load Test (escenario_load): Calibra la "Línea Base" (Baseline) del sistema. Queremos ver si con 50 usuarios concurrentes estables las métricas de hardware y tiempos de respuesta se mantienen planos y dentro del SLA.
+
+Stress Test (escenario_stress): Buscamos el Punto de Saturación. Incrementamos escalonadamente hasta 500 usuarios para ver qué componente falla primero (¿La base de datos se queda sin conexiones? ¿El microservicio satura el CPU?).
+
+Spike Test (escenario_spike): Evaluamos el Autoscaling. Al pasar de 0 a 600 usuarios en 20 segundos, forzamos a Kubernetes a reaccionar. El objetivo es medir cuántas peticiones fallan en el "lapso de retraso" (delay) que le toma a la infraestructura levantar nuevos Pods para balancear la carga.
+
+Soak Test (escenario_soak): Controlamos la Estabilidad Temporal. Sostenemos una carga media durante 30 minutos continuos. Si la gráfica de consumo de memoria de los contenedores tiene una pendiente ascendente constante sin estabilizarse, encontramos un Memory Leak.
