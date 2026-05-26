@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-under-test
+  namespace: qa-performance
+  labels:
+    app: api-under-test
+spec:
+  replicas: 2 # Iniciamos con 2 Pods para asegurar alta disponibilidad básica
+  selector:
+    matchLabels:
+      app: api-under-test
+  template:
+    metadata:
+      labels:
+        app: api-under-test
+    spec:
+      containers:
+      - name: mock-api
+        image: jsonplaceholder-mock:latest # Imagen simulada de la API bajo prueba
+        ports:
+        - containerPort: 80
+        
+        #  CONFIGURACIÓN DE RECURSOS (Crucial para Ingeniería de Performance)
+        resources:
+          requests:
+            memory: "64Mi"   # Lo que el Pod necesita como mínimo para arrancar
+            cpu: "250m"      # 0.25 de un núcleo de CPU
+          limits:
+            memory: "128Mi"  # Límite máximo. Si k6 hace que pase esto, da OOMKilled
+            cpu: "500m"      # Límite de CPU para forzar la métrica de estrangulamiento (Throttling)
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-under-test-service
+  namespace: qa-performance
+spec:
+  type: ClusterIP
+  selector:
+    app: api-under-test
+  ports:
+  - port: 80
+    targetPort: 80
